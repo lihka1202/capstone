@@ -30,6 +30,7 @@ def generate_data(
             y.append(ele)
 
     x = np.array(x)
+    y = np.array(y)
 
     return x, y
 
