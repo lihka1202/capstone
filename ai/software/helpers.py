@@ -101,10 +101,11 @@ def extract_features(data):
     tstd_dev = np.std(data)
     trms = np.sqrt(np.mean(np.square(data)))
 
-    freq = np.fft.fft(data)
-    fmin = np.min(freq)
-    fmax = np.max(freq)
-    fpower = np.sum(np.square(np.abs(freq)))
+    freq = np.fft.rfft(data)
+    fft_magnitude = np.abs(freq)
+    fmin = np.min(fft_magnitude)
+    fmax = np.max(fft_magnitude)
+    fpower = np.sum(np.square(np.abs(fft_magnitude)))
 
     features = np.array([tmin, tmax, tmean, tstd_dev, trms, fmin, fmax, fpower])
 
