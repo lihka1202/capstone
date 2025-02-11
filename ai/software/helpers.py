@@ -78,7 +78,7 @@ def convert_time_series_to_features(x):
         x (np.array): feature matrix (no. of samples x no. of features)
         y (np.array): labels (0 or 1)
     """
-    result = np.apply_along_axis(extract_features, axis=2, arr=x)
+    result = np.apply_along_axis(extract_features, axis=1, arr=x)
     features = result.reshape(result.shape[0], -1)
 
     return features
