@@ -31,6 +31,8 @@ mlp = ol.mlp_0
 CONTROL_REGISTER = 0x0
 mlp.write(CONTROL_REGISTER, 0x81)
 
+print("FPGA initialized")
+
 with open("scaler.pkl", "rb") as f:
     scaler = pickle.load(f)
 
