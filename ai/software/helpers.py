@@ -5,6 +5,7 @@ def generate_data(
     tuples,
     features,
     window_size,
+    stride,
 ):
     """
     This function loads the data and returns it as numpy arrays.
@@ -15,7 +16,7 @@ def generate_data(
 
     Returns:
         x (np.array): feature matrix
-        y (np.array): labels (0 or 1)
+        y (np.array): labels
     """
 
     x = []
@@ -23,7 +24,9 @@ def generate_data(
 
     for df, label in tuples:
         feature_vector = df[features].to_numpy()
-        x_windows, y_windows = sliding_window(feature_vector, label, window_size)
+        x_windows, y_windows = sliding_window(
+            feature_vector, label, window_size, stride
+        )
         for ele in x_windows:
             x.append(ele)
         for ele in y_windows:
@@ -35,7 +38,7 @@ def generate_data(
     return x, y
 
 
-def sliding_window(x, y, window_size):
+def sliding_window(x, y, window_size, stride):
     """
     This function creates a sliding window representation of the data.
 
@@ -44,10 +47,6 @@ def sliding_window(x, y, window_size):
         y (np.array): labels (no. of samples)
         window_size (int): size of sliding window
     """
-    if window_size % 2 != 0:
-        raise ValueError("Window size must be an even number.")
-
-    stride = window_size // 2
 
     # Initialize empty lists
     x_window = []
@@ -56,7 +55,10 @@ def sliding_window(x, y, window_size):
     # Create sliding windows
     idx = 0
     while idx + window_size <= len(x):
-        x_window.append(x[idx : idx + window_size])
+        x_window.append(x[idx : idx + stride])
+        # x_window.append(
+        # x[idx : idx + window_size] * np.hamming(window_size)[:, None]
+        # )  # Apply hamming window
         idx += stride
 
     # Convert to numpy arrays
@@ -72,11 +74,9 @@ def convert_time_series_to_features(x):
 
     Args:
         x (np.array): feature matrix (no. of samples x no. of time steps x no. of features)
-        y (np.array): labels (0 or 1)
 
     Returns:
         x (np.array): feature matrix (no. of samples x no. of features)
-        y (np.array): labels (0 or 1)
     """
     result = np.apply_along_axis(extract_features, axis=1, arr=x)
     features = result.reshape(result.shape[0], -1)
@@ -105,8 +105,12 @@ def extract_features(data):
     fft_magnitude = np.abs(freq)
     fmin = np.min(fft_magnitude)
     fmax = np.max(fft_magnitude)
-    fpower = np.sum(np.square(np.abs(fft_magnitude)))
+    fpower = np.sum(fft_magnitude**2)
 
-    features = np.array([tmin, tmax, tmean, tstd_dev, trms, fmin, fmax, fpower])
+    features = np.append(
+        np.array([tmin, tmax, tmean, tstd_dev, trms, fmin, fmax, fpower]),
+        data.flatten(),
+    )
+    # features = np.array([tmin, tmax, tmean, tstd_dev, trms, fmin, fmax, fpower])
 
     return features
