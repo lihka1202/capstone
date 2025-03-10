@@ -241,3 +241,208 @@ void Update()
 ```
 > Whenever you detect a spacebar, add `Vector2.up` amount of velocity. For context Vector2.up is essentially (0,1) force in the Y direction.
 
+So you can generalize and expand the same principle in the following way:
+
+```csharp
+void Update()
+    {
+        Dictionary<KeyCode, Vector2> movement = new Dictionary<KeyCode, Vector2>{
+            {KeyCode.W, Vector2.up},
+            {KeyCode.A, Vector2.left},
+            {KeyCode.S, Vector2.down},
+            {KeyCode.D, Vector2.right}
+        };
+
+        if (Input.anyKeyDown)
+        {
+            foreach (KeyCode keyCode in System.Enum.GetValues(typeof(KeyCode)))
+            {
+                if (Input.GetKeyDown(keyCode) && movement.ContainsKey(keyCode))
+                {
+                    // Set the rigidbody velocity based on the dictionary value
+                    rigidbody2D.linearVelocity = movement[keyCode] * 10;
+                }
+
+            }
+        }
+    }
+```
+
+In essence, what you're doing is that at every keystroke you're moving.
+
+But then again, that is not the point of this, so we move on to the following instead.
+
+### Add more variables
+
+Now, the strength of each flap doesn't really look right. Whats the best way to do this? We can add a new variable that accounts for this thing called flap strength. This can be done in the same way that we added `RigidBody2D` to our code.
+
+```csharp
+{
+
+    // Add a reference to the RigidBody2 sector
+    public new Rigidbody2D rigidbody2D;
+    public float flapStrength;
+    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    void Start()
+    {
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Space) == true)
+        {
+            rigidbody2D.linearVelocity = Vector2.up * flapStrength;
+        }
+    }
+}
+```
+
+Will lead to something like this:
+
+![Flap Strength Addition to the script](image-9.png)
+
+### Randomized pipe spawning into the world and make them delete themselves
+
+So first you want to create a new game object called pipe. And then you can actually nest game objects in each other.
+
+When you nest game objects inside each other, you can control the functionality of each of these game objects indivdually. Something like this:
+
+![Nested Game Objects](image-10.png)
+
+So in essence, what you have to do, is create a `pipe` game object, and then create 2 sub parts of these objects
+
+In order to create the subpart(sub game object), you just need to `RightClick` on the `GameObject` and click `Add Empty`. This would allow you to create sub objects. Note that when you click the main object, you would be able to move both parts of pipes together.
+
+So it would look something like this:
+
+![Subpart imaging](image-11.png)
+
+And the whole thing would look something like this:
+
+![Image of bird](image-12.png)
+
+### Making the pipes move
+
+> For context, the white box around this, is considered to be the game area, where everything you do would be rednered between this frame. So if you're checking for scaling, you might want to expand out and check for these boxes.
+
+
+Now, we make the pipes move, this can be done by writing a simple script
+
+All you really have to do, is to transform this object and transform it on along the x-axis. So in this case we can make use of `Vector3.Left` to help us to do this.
+
+So it can be something like this:
+
+```csharp
+using UnityEngine;
+
+public class PipeMotionScript : MonoBehaviour
+{
+    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    public float moveSpeed = 2;
+    void Start()
+    {
+
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        transform.position += Vector3.left * moveSpeed;
+    }
+}
+
+```
+
+> You would need to play with `moveSpeed` in order to be able to move this.
+
+So when you use something like 2, you'd begin to realize that this is very very fast, and this can be solved, once you see the framerate during the game execution.
+
+![Frame Rate analysis](image-13.png)
+
+yeah, we're running on 1658 frames per second, which is a bad bad idea. This is because of the game running itself, and being agnostic about different framerates on different devices. In order to get around this, we would need to ensure that we multiply this with a `timeDelta`.
+
+A balancer for devices across framerate issues.
+
+> We don't need it for the physics engine side of things, since it runs on its own clocks for the most bit.
+
+So the final code would look like this
+
+```csharp
+void Update()
+    {
+        transform.position += Vector3.left * moveSpeed * Time.deltaTime;
+    }
+```
+
+The best place to check for something of this sort would be the `Unity` docs,and you would find more information and sample code.
+
+So now that the `Pipe` game object has been place in nicely, what we can do is create a `PreFab`.
+
+#### Prefabricated Game Objects
+
+Essentially these are custom built game objects with a certain sense of inherent physics ability (and texture and sprites) that can be used and modified by creating other game objects based on them. Its a bit like this is the abstract class now, and the other game objects are existing on the same place, more or less.
+
+So now once this has been done (You'd see `pipe` as a separate asset under the assets class).
+
+No we can create a new game object, and make use of this game object. There are many ways to work with this data, but in our case we'll wrap this inside another game object, and this game object can start spawning the object slightly better.
+
+Now we delete the pipe `GameObject` and basically end up using this prefab inside another game object
+
+So we basically just create another `GameObject` called `PipeSpawner` and add some code using a script called  `PipeSpawnerScript`.
+
+#### Spawning `GameObjects`.
+
+This can be done using the `Instantiate` command, which is basically the eequivalent of a constructor, and seems to serve the same purpose.
+
+The code might look  like this:
+
+```csharp
+void Update()
+    {
+        Instantiate(pipe, transform.position, transform.rotation);
+    }
+```
+
+Now, this might seem right, but it ends up producing the wrong sort of effect.
+
+The pipes are moving since the prefab object's nature is to move, as we defined each pipe in the script earlier. However, each object is moving, which means that we need to consider something.
+
+The pipes that are moving, need to be spaced out, by the higher level object.
+
+#### Building a timer to spawn between seconds
+
+Essentially, need to create a spawner that we can use to spawn, and cause a delay between spawn times.
+
+```csharp
+using UnityEngine;
+
+public class PipeSpawnerScript : MonoBehaviour
+{
+    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    public GameObject pipe;
+    public float spawnRate = 2; // The time/number of frames between spawn
+    private float timer = 0; // The main timer
+    void Start()
+    {
+
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        // Use this like a for loop
+        if (timer < spawnRate)
+        {
+            // To account per frame rate
+            timer += Time.deltaTime;
+        }
+        else
+        {
+            timer = 0;
+            Instantiate(pipe, transform.position, transform.rotation);
+        }
+    }
+}
+
+```
