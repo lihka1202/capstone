@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.stats import skew, kurtosis
 
 
 def generate_data(
@@ -105,12 +106,11 @@ def extract_features(data):
     fft_magnitude = np.abs(freq)
     fmin = np.min(fft_magnitude)
     fmax = np.max(fft_magnitude)
-    fpower = np.sum(fft_magnitude**2)
+    fpower = np.sum(fft_magnitude**2) / len(fft_magnitude)
 
     features = np.append(
         np.array([tmin, tmax, tmean, tstd_dev, trms, fmin, fmax, fpower]),
         data.flatten(),
     )
-    # features = np.array([tmin, tmax, tmean, tstd_dev, trms, fmin, fmax, fpower])
 
     return features
