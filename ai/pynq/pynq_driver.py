@@ -3,8 +3,8 @@ import os
 import numpy as np
 import pickle
 
-INPUT_NODES = 168
-OUTPUT_NODES = 7
+INPUT_NODES = 108
+OUTPUT_NODES = 8
 
 cwd = os.getcwd()
 bitstream_path = os.path.join(cwd, "mlp.bit")
@@ -60,12 +60,13 @@ def _get_fpga_output(input_data):
         dma_receive.wait()
         # --------------- TIMING ---------------- #
         action = np.argmax(output_buffer)
+        score = np.max(np.array(output_buffer))
 
     except Exception as e:
         print("FPGA error")
         print(e)
         return
-    return action
+    return action, score
 
 
 def _convert_time_series_to_features(x):
@@ -105,7 +106,7 @@ def _extract_features(data):
     fft_magnitude = np.abs(freq)
     fmin = np.min(fft_magnitude)
     fmax = np.max(fft_magnitude)
-    fpower = np.sum(fft_magnitude**2)
+    fpower = np.sum(fft_magnitude**2) / len(fft_magnitude)
 
     features = np.append(
         np.array([tmin, tmax, tmean, tstd_dev, trms, fmin, fmax, fpower]),
