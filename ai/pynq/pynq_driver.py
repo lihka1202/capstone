@@ -39,7 +39,7 @@ with open("scaler.pkl", "rb") as f:
 
 def get_result(input_data):
     """
-    Takes in 20 time steps * 6 imu data points and returns an action
+    Takes in 10 time steps * 6 imu data points and returns an action
     """
     input_data = _convert_time_series_to_features(input_data)
     input_data = scaler.transform(input_data.reshape(1, -1))
@@ -112,6 +112,5 @@ def _extract_features(data):
         np.array([tmin, tmax, tmean, tstd_dev, trms, fmin, fmax, fpower]),
         data.flatten(),
     )
-    # features = np.array([tmin, tmax, tmean, tstd_dev, trms, fmin, fmax, fpower])
 
     return features
