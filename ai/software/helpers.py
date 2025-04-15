@@ -56,9 +56,9 @@ def sliding_window(x, y, window_size, stride):
     # Create sliding windows
     idx = 0
     while idx + window_size <= len(x):
-        x_window.append(x[idx : idx + stride])
+        x_window.append(x[idx : idx + window_size])
         # x_window.append(
-        # x[idx : idx + window_size] * np.hamming(window_size)[:, None]
+        #   x[idx : idx + window_size] * np.hamming(window_size)[:, None]
         # )  # Apply hamming window
         idx += stride
 
@@ -101,6 +101,11 @@ def extract_features(data):
     tmean = np.mean(data)
     tstd_dev = np.std(data)
     trms = np.sqrt(np.mean(np.square(data)))
+    # tskewness = skew(data)
+    # tkurtosis = kurtosis(data)
+    # tenergy = np.sum(data**2) / len(data)
+    # tvariance = np.var(data)
+    # tmedian = np.median(data)
 
     freq = np.fft.rfft(data)
     fft_magnitude = np.abs(freq)
@@ -109,7 +114,23 @@ def extract_features(data):
     fpower = np.sum(fft_magnitude**2) / len(fft_magnitude)
 
     features = np.append(
-        np.array([tmin, tmax, tmean, tstd_dev, trms, fmin, fmax, fpower]),
+        np.array(
+            [
+                tmin,
+                tmax,
+                tmean,
+                tstd_dev,
+                trms,
+                # tskewness,
+                # tkurtosis,
+                # tenergy,
+                # tvariance,
+                # tmedian,  # time domain features
+                fmin,
+                fmax,
+                fpower,
+            ]
+        ),
         data.flatten(),
     )
 
