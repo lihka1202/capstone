@@ -13,7 +13,7 @@
   - `mlp_mock.ipynb` - Mock implementation of the MLP model on an online dataset
   - `data_augmentation.ipynb` - Jupyter notebook containing scripts to modify the dataset for training
   - `dataset/` - Contains the dataset used for the software model
-    - 'augmented_xxx.csv' - Final dataset used for training the model
+    - `augmented_xxx.csv` - Final dataset used for training the model
 
 ## Instructions to work with FPGA
 
