@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 94e809432f0563a4ebd1ad70b7325717
+timeCreated: 1457346788
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 57656
+  packageName: Viking Shield
+  packageVersion: 1.0
+  assetPath: Assets/Viking Shield/Materials/M_Viking_Shield.mat
+  uploadId: 107980
