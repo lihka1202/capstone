@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QCARConfig>
+  <Tracking>
+    <ImageTarget name="tralalelo_darker" size="0.200000 0.200000" />
+    <ImageTarget name="bombardinocrocodilo" size="0.200000 0.200000" />
+    <ImageTarget name="worldcentercomplexity" size="0.200000 0.200000" />
+    <ImageTarget name="IT2" size="0.270933 0.270933" />
+  </Tracking>
+</QCARConfig>
