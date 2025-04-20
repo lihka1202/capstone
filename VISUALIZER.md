@@ -1,0 +1,3 @@
+# Key things to note
+
+Visualizer-Assets contains the source code for everything, however if you wish to get the unity package with all the dependencies and scripts in it, it can be found [here](https://drive.google.com/drive/folders/1J7x2Ko9pHqc-Y2OkTXicd5QGHNZlMvEf?usp=share_link). Its stored in a drive, all you have to do is download it, and add it as a dependency and load the scene to the unity project.
